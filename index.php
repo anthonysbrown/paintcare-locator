@@ -141,9 +141,11 @@ class PaintCareLocator{
 			$map_vars['center']['lng'] = '-92.8772965';
 			$map_vars['zoom'] = '4';
 			#get the template
+			ob_start();
 			pl_get_template('map');
-			
-			
+			$content = ob_get_contents();
+			ob_end_clean();
+			return $content;
 			
 		}
 	

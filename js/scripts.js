@@ -42,6 +42,54 @@ function initPlMap() {
         return false;
 
     });
+	
+	
+	
+	 
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var geo_pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+		console.log(geo_pos);
+           	
+		   var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+			geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({'latLng': latlng}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            if (results[0]) {
+                for (j = 0; j < results[0].address_components.length; j++) {
+                    if (results[0].address_components[j].types[0] == 'postal_code'){
+                        console.log("Zip Code: " + results[0].address_components[j].short_name);
+						
+						var zipcode = results[0].address_components[j].short_name;
+					//jQuery("#pac-input").val(zipcode);
+					getAddressInfoByZip(zipcode);
+					}
+								
+                }
+				
+            }
+			
+        } else {
+            console.log("Geocoder failed due to: " + status);
+        }
+    });
+		   
+		   
+		   
+		   
+          }, function() {
+          var  geo_pos = false;
+		  
+          });
+        } else {
+          var  geo_pos = false;
+          
+        }
 
 
 
@@ -82,10 +130,10 @@ function initPlMap() {
                         if (paintcare.map_icons[value.LocationType]) {
                             var icon = paintcare.map_icons[value.LocationType];
 							if(icon == ''){
-								icon = 'place';	
+								icon =  paintcare.plugin_uri + 'images/red-circle.png';	
 							}
                         } else {
-							var icon =	'place';
+							var icon =	paintcare.plugin_uri + 'images/red-circle.png';	
                         }
 
                         // Create a marker for each place.
@@ -151,7 +199,12 @@ function initPlMap() {
         }
     }
 	
-
+	 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+      }
     function getLocation() {
         getAddressInfoByZip(document.forms[0].zip.value);
     }
